@@ -294,7 +294,7 @@ static void monitor_sdl_clean_up(void)
 static void monitor_sdl_init(void)
 {
     /*Initialize the SDL*/
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK); // for switch joystick
 
     SDL_SetEventFilter(quit_filter, NULL);
 

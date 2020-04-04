@@ -281,12 +281,22 @@
 /*No settings*/
 #endif
 
+/*---------------------------------------
+ * Mouse or touchpad on PC (using SDL)
+ *-------------------------------------*/
+#ifndef USE_TOUCH
+#  define USE_TOUCH           1
+#endif
+
+#if USE_TOUCH
+/*No settings*/
+#endif
 
 /*---------------------------------------
  * Mouse or touchpad on PC (using SDL)
  *-------------------------------------*/
 #ifndef USE_MOUSE
-#  define USE_MOUSE           1
+#  define USE_MOUSE           0
 #endif
 
 #if USE_MOUSE

@@ -10,7 +10,7 @@
 
 // lvgl drivers
 #include <lv_drivers/display/monitor.h>
-#include <lv_drivers/indev/mouse.h>
+#include <lv_drivers/indev/touch.h>
 
 // lvgl demo
 #include <lv_examples/lv_examples.h>
@@ -49,8 +49,8 @@ static int lvgl_init(void)
 
     /* Create a display buffer */
     static lv_disp_buf_t disp_buf1;
-    static lv_color_t buf1_1[480*10]; 
-    lv_disp_buf_init(&disp_buf1, buf1_1, NULL, 480*10);
+    static lv_color_t buf1_1[2*1024*1024]; 
+    lv_disp_buf_init(&disp_buf1, buf1_1, NULL, size_t(buf1_1));
 
     /* Create a display */
     monitor_init();
@@ -60,20 +60,20 @@ static int lvgl_init(void)
     disp_drv.flush_cb = monitor_flush;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
     lv_disp_drv_register(&disp_drv);
 
-    /* Add the mouse as input device
-     * Use the 'mouse' driver which reads the PC's mouse*/
-    mouse_init();
+    /* Add the touch as input device
+     * Use the 'touch' driver which reads the PC's mouse*/
+    touch_init();
     lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);          /*Basic initialization*/
     indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = mouse_read;         /*This function will be called periodically (by the library) to get the mouse position and state*/
-    lv_indev_t * mouse_indev = lv_indev_drv_register(&indev_drv);
+    indev_drv.read_cb = touch_read;         /*This function will be called periodically (by the library) to get the mouse position and state*/
+    lv_indev_t *mouse_indev = lv_indev_drv_register(&indev_drv);
 
-    /* Set a cursor for the mouse */
-    LV_IMG_DECLARE(mouse_cursor_icon);                          /*Declare the image file.*/
-    lv_obj_t * cursor_obj =  lv_img_create(lv_disp_get_scr_act(NULL), NULL); /*Create an image object for the cursor */
-    lv_img_set_src(cursor_obj, &mouse_cursor_icon);             /*Set the image source*/
-    lv_indev_set_cursor(mouse_indev, cursor_obj);               /*Connect the image  object to the driver*/
+    // /* Set a cursor for the mouse */
+    // LV_IMG_DECLARE(mouse_cursor_icon);                          /*Declare the image file.*/
+    // lv_obj_t *cursor_obj = lv_img_create(lv_disp_get_scr_act(NULL), NULL); /*Create an image object for the cursor */
+    // lv_img_set_src(cursor_obj, &mouse_cursor_icon);             /*Set the image source*/
+    // lv_indev_set_cursor(mouse_indev, cursor_obj);               /*Connect the image  object to the driver*/
 
     /* Tick init.
      * You have to call 'lv_tick_inc()' in periodically to inform LittelvGL about how much time were elapsed
@@ -92,14 +92,15 @@ int main(int argc, char *argv[])
     lvgl_init(); 
     // demo_create();
 
+    // benchmark_create(); 
+
     lv_theme_t *th = lv_theme_material_init(210, LV_FONT_DEFAULT);
     lv_test_theme_1(th); 
+
     // lv_test_theme_2(); 
 
     while(1)
     {
-        SDL_Event event;
-
         lv_task_handler();
         svcSleepThread(5000ULL);
         hidScanInput();
@@ -110,10 +111,7 @@ int main(int argc, char *argv[])
             break; 
         }
 
-        while(SDL_PollEvent(&event))
-        {
-            mouse_handler(&event);
-        }
+        touch_handler();
     }
 
     return 0; 
